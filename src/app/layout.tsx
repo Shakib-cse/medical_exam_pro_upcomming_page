@@ -14,13 +14,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://medicalexampro.com"),
-  title: "Kawan Medical Exam Pro — Launching Soon | The Ultimate UK MSRA Platform",
+  title: "Medical Exam Pro — Launching November 2026",
   description:
-    "Prepare your strongest performance on the UK MSRA and specialty recruitment exams. 10,000+ clinical questions, realistic mock exam simulators, and AI analytics. Coming very soon to the official domain.",
+    "The clinical exam preparation platform for the UK MSRA and medical recruitment exams. Launching November 2026.",
   keywords: [
     "MSRA",
     "Medical Exam Pro",
-    "Kawan Medical Exam Pro",
     "Clinical Problem Solving",
     "Professional Dilemma",
     "UK Medical Training",
@@ -29,15 +28,15 @@ export const metadata: Metadata = {
     "Junior Doctors UK",
   ],
   openGraph: {
-    title: "Kawan Medical Exam Pro — Launching Soon",
+    title: "Medical Exam Pro — Launching November 2026",
     description:
-      "Thousands of carefully written questions by UK doctors, tailored to the real MSRA and UK medical training applications. Register for VIP Early Access.",
+      "The clinical exam preparation platform for the UK MSRA and medical recruitment exams. Launching November 2026.",
     images: [
       {
-        url: "/images/banner.png",
-        width: 1200,
-        height: 630,
-        alt: "Kawan Medical Exam Pro Launching Soon",
+        url: "/images/headerlogo.png",
+        width: 731,
+        height: 84,
+        alt: "Medical Exam Pro",
       },
     ],
   },

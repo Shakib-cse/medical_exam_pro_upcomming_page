@@ -12,27 +12,22 @@ const FAQS: FaqItem[] = [
   {
     question: "When will Kawan Medical Exam Pro go live on the main domain?",
     answer:
-      "The official platform launch is set for 15 October 2026 at 09:00 London (BST). All cloud infrastructure and Pearson VUE simulator clusters are currently in final staging. Doctors who reserve their VIP Early Access pass will receive immediate priority notification and access at launch.",
-  },
-  {
-    question: "What perks do I get with early enrolment today?",
-    answer:
-      "Early enrollees lock in priority platform access, secret post-launch bonuses, complimentary full mock exam simulator trials, and exclusive gifts that will be unveiled immediately after our 15 October launch!",
+      "The platform is currently in final staging and testing and will be officially launched on this domain soon.",
   },
   {
     question: "What makes Medical Exam Pro different from existing question banks?",
     answer:
-      "Unlike outdated banks with obsolete question styles, Medical Exam Pro is built from scratch by UK NHS consultants and high-scoring registrars. We feature exact Pearson VUE test center software emulation, 2026 NICE guideline updates, and AI predictive rank analytics that forecast your specialty recruitment decile.",
+      "Medical Exam Pro is built specifically for UK medical recruitment exams, featuring authentic clinical question scenarios, GMC and NICE guideline alignments, and realistic exam pacing.",
   },
   {
-    question: "Which medical exams and specialties are covered at launch?",
+    question: "Which medical exams and specialties are covered?",
     answer:
       "Our initial launch prioritizes the UK Multi-Specialty Recruitment Assessment (MSRA), serving candidates applying for General Practice (GP), Clinical Radiology, Anaesthetics & ACCS, Psychiatry, Ophthalmology, Core Surgical Training (CST), Emergency Medicine, and Obstetrics & Gynaecology.",
   },
   {
     question: "Will there be mobile app support for iOS and Android?",
     answer:
-      "Yes. The mobile companion apps are releasing alongside the web platform, featuring full offline question caching so you can revise smoothly during commutes or in hospital basements.",
+      "Yes. Mobile companion apps with offline caching will accompany the platform so candidates can review questions during ward rounds or commutes.",
   },
 ];
 
@@ -51,10 +46,10 @@ export default function FaqSection() {
           <span>FREQUENTLY ASKED QUESTIONS</span>
         </div>
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-          Everything You Need to Know
+          Frequently Asked Questions
         </h2>
         <p className="mt-2 text-xs sm:text-base text-slate-300">
-          Got questions about the 15 October launch? Here are direct answers.
+          Direct answers about Kawan Medical Exam Pro and the upcoming platform.
         </p>
       </div>
 

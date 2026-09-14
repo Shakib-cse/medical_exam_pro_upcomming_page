@@ -120,15 +120,15 @@ export default function FeatureSneakPeek() {
     <section id="features-sneak-peek" className="w-full max-w-6xl mx-auto my-12 sm:my-20 px-3 sm:px-4 scroll-mt-24">
       {/* Title */}
       <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-10 px-1">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FF6B00]/15 border border-[#FF6B00]/30 text-[#FF8533] text-xs font-semibold mb-3">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1D82EB]/15 border border-[#1D82EB]/30 text-[#38BDF8] text-xs font-semibold mb-3">
           <Layers className="w-4 h-4" />
-          <span>FLAGSHIP CAPABILITIES REVEAL</span>
+          <span>PLATFORM OVERVIEW</span>
         </div>
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-          What&apos;s Coming in Medical Exam Pro v2.0
+          Upcoming Platform Features
         </h2>
         <p className="mt-2 text-xs sm:text-base text-slate-300">
-          Engineered specifically for the competitive reality of UK medical recruitment and high-stakes clinical exams.
+          Core training modules currently in preparation for UK MSRA candidates.
         </p>
       </div>
 
@@ -224,9 +224,9 @@ export default function FeatureSneakPeek() {
               <div className="absolute bottom-4 left-4 right-4 p-3 rounded-xl bg-[#061727]/90 backdrop-blur-md border border-white/15 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                  <span className="text-xs font-semibold text-white">Feature Complete • Launch Ready</span>
+                  <span className="text-xs font-semibold text-white">Platform Staging</span>
                 </div>
-                <span className="text-[11px] font-mono text-[#FF8533] font-bold">PRO TIER</span>
+                <span className="text-[11px] font-mono text-[#38BDF8] font-medium">MSRA Module</span>
               </div>
             </div>
           </div>
