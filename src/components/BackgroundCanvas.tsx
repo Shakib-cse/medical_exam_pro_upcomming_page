@@ -15,9 +15,14 @@ export default function BackgroundCanvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
+    // If user prefers reduced motion, do not run heavy animation
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
     let animationFrameId: number;
@@ -29,20 +34,22 @@ export default function BackgroundCanvas() {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
     };
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize, { passive: true });
 
-    // Create medical network nodes
-    const nodeCount = Math.min(Math.floor((width * height) / 18000), 70);
+    // Adaptive node count based on screen size (max 50 on desktop, max 25 on mobile)
+    const isMobile = width < 768;
+    const maxNodes = isMobile ? 25 : 55;
+    const nodeCount = Math.min(Math.floor((width * height) / 22000), maxNodes);
     const nodes: Node[] = [];
 
     for (let i = 0; i < nodeCount; i++) {
       nodes.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.45,
-        vy: (Math.random() - 0.5) * 0.45,
-        radius: Math.random() * 2 + 1,
-        baseAlpha: Math.random() * 0.5 + 0.2,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        radius: Math.random() * 1.8 + 1,
+        baseAlpha: Math.random() * 0.4 + 0.2,
       });
     }
 
@@ -54,9 +61,23 @@ export default function BackgroundCanvas() {
       mouseY = e.clientY;
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+
+    let isVisible = true;
+    const handleVisibilityChange = () => {
+      isVisible = !document.hidden;
+      if (isVisible) {
+        animationFrameId = requestAnimationFrame(render);
+      } else {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    const connectionDist = isMobile ? 100 : 125;
 
     const render = () => {
+      if (!isVisible) return;
       ctx.clearRect(0, 0, width, height);
 
       // Update and draw nodes
@@ -71,12 +92,14 @@ export default function BackgroundCanvas() {
         else if (node.y > height) node.y = 0;
 
         // Mouse proximity glow
-        const dxMouse = mouseX - node.x;
-        const dyMouse = mouseY - node.y;
-        const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
         let alpha = node.baseAlpha;
-        if (distMouse < 180) {
-          alpha += (1 - distMouse / 180) * 0.6;
+        if (mouseX > 0) {
+          const dxMouse = mouseX - node.x;
+          const dyMouse = mouseY - node.y;
+          const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+          if (distMouse < 160) {
+            alpha += (1 - distMouse / 160) * 0.5;
+          }
         }
 
         ctx.beginPath();
@@ -91,8 +114,8 @@ export default function BackgroundCanvas() {
           const dy = node.y - other.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 130) {
-            const lineAlpha = (1 - dist / 130) * 0.16;
+          if (dist < connectionDist) {
+            const lineAlpha = (1 - dist / connectionDist) * 0.15;
             ctx.beginPath();
             ctx.moveTo(node.x, node.y);
             ctx.lineTo(other.x, other.y);
@@ -106,11 +129,12 @@ export default function BackgroundCanvas() {
       animationFrameId = requestAnimationFrame(render);
     };
 
-    render();
+    animationFrameId = requestAnimationFrame(render);
 
     return () => {
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
