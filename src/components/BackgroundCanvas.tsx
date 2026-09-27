@@ -1,143 +1,107 @@
-"use client";
-
-import React, { useEffect, useRef } from "react";
-
-interface Node {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  radius: number;
-  baseAlpha: number;
-}
+import React from "react";
 
 export default function BackgroundCanvas() {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    // If user prefers reduced motion, do not run heavy animation
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return;
-    }
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d", { alpha: true });
-    if (!ctx) return;
-
-    let animationFrameId: number;
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
-
-    const handleResize = () => {
+  const canvasScript = `
+    (function() {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var canvas = document.getElementById('medical-network-canvas');
       if (!canvas) return;
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    };
-    window.addEventListener("resize", handleResize, { passive: true });
+      var ctx = canvas.getContext('2d', { alpha: true });
+      if (!ctx) return;
 
-    // Adaptive node count based on screen size (max 50 on desktop, max 25 on mobile)
-    const isMobile = width < 768;
-    const maxNodes = isMobile ? 25 : 55;
-    const nodeCount = Math.min(Math.floor((width * height) / 22000), maxNodes);
-    const nodes: Node[] = [];
+      var width = canvas.width = window.innerWidth;
+      var height = canvas.height = window.innerHeight;
 
-    for (let i = 0; i < nodeCount; i++) {
-      nodes.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        radius: Math.random() * 1.8 + 1,
-        baseAlpha: Math.random() * 0.4 + 0.2,
+      window.addEventListener('resize', function() {
+        if (!canvas) return;
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }, { passive: true });
+
+      var isMobile = width < 768;
+      var maxNodes = isMobile ? 24 : 50;
+      var nodeCount = Math.min(Math.floor((width * height) / 22000), maxNodes);
+      var nodes = [];
+
+      for (var i = 0; i < nodeCount; i++) {
+        nodes.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          radius: Math.random() * 1.8 + 1,
+          baseAlpha: Math.random() * 0.4 + 0.2
+        });
+      }
+
+      var mouseX = -1000;
+      var mouseY = -1000;
+      window.addEventListener('mousemove', function(e) {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      }, { passive: true });
+
+      var isVisible = true;
+      document.addEventListener('visibilitychange', function() {
+        isVisible = !document.hidden;
+        if (isVisible) requestAnimationFrame(render);
       });
-    }
 
-    let mouseX = -1000;
-    let mouseY = -1000;
+      var connectionDist = isMobile ? 100 : 125;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    };
+      function render() {
+        if (!isVisible) return;
+        ctx.clearRect(0, 0, width, height);
 
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+        for (var i = 0; i < nodes.length; i++) {
+          var n = nodes[i];
+          n.x += n.vx;
+          n.y += n.vy;
 
-    let isVisible = true;
-    const handleVisibilityChange = () => {
-      isVisible = !document.hidden;
-      if (isVisible) {
-        animationFrameId = requestAnimationFrame(render);
-      } else {
-        cancelAnimationFrame(animationFrameId);
-      }
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+          if (n.x < 0) n.x = width;
+          else if (n.x > width) n.x = 0;
+          if (n.y < 0) n.y = height;
+          else if (n.y > height) n.y = 0;
 
-    const connectionDist = isMobile ? 100 : 125;
+          var alpha = n.baseAlpha;
+          if (mouseX > 0) {
+            var dxm = mouseX - n.x;
+            var dym = mouseY - n.y;
+            var distM = Math.sqrt(dxm * dxm + dym * dym);
+            if (distM < 160) {
+              alpha += (1 - distM / 160) * 0.5;
+            }
+          }
 
-    const render = () => {
-      if (!isVisible) return;
-      ctx.clearRect(0, 0, width, height);
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(56, 189, 248, ' + Math.min(alpha, 0.9) + ')';
+          ctx.fill();
 
-      // Update and draw nodes
-      for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
-        node.x += node.vx;
-        node.y += node.vy;
+          for (var j = i + 1; j < nodes.length; j++) {
+            var o = nodes[j];
+            var dx = n.x - o.x;
+            var dy = n.y - o.y;
+            var dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (node.x < 0) node.x = width;
-        else if (node.x > width) node.x = 0;
-        if (node.y < 0) node.y = height;
-        else if (node.y > height) node.y = 0;
-
-        // Mouse proximity glow
-        let alpha = node.baseAlpha;
-        if (mouseX > 0) {
-          const dxMouse = mouseX - node.x;
-          const dyMouse = mouseY - node.y;
-          const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
-          if (distMouse < 160) {
-            alpha += (1 - distMouse / 160) * 0.5;
+            if (dist < connectionDist) {
+              var lineAlpha = (1 - dist / connectionDist) * 0.15;
+              ctx.beginPath();
+              ctx.moveTo(n.x, n.y);
+              ctx.lineTo(o.x, o.y);
+              ctx.strokeStyle = 'rgba(29, 130, 235, ' + lineAlpha + ')';
+              ctx.lineWidth = 0.75;
+              ctx.stroke();
+            }
           }
         }
 
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(56, 189, 248, ${Math.min(alpha, 0.9)})`;
-        ctx.fill();
-
-        // Connect with nearby nodes
-        for (let j = i + 1; j < nodes.length; j++) {
-          const other = nodes[j];
-          const dx = node.x - other.x;
-          const dy = node.y - other.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < connectionDist) {
-            const lineAlpha = (1 - dist / connectionDist) * 0.15;
-            ctx.beginPath();
-            ctx.moveTo(node.x, node.y);
-            ctx.lineTo(other.x, other.y);
-            ctx.strokeStyle = `rgba(29, 130, 235, ${lineAlpha})`;
-            ctx.lineWidth = 0.75;
-            ctx.stroke();
-          }
-        }
+        requestAnimationFrame(render);
       }
 
-      animationFrameId = requestAnimationFrame(render);
-    };
-
-    animationFrameId = requestAnimationFrame(render);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
+      requestAnimationFrame(render);
+    })();
+  `;
 
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
@@ -157,7 +121,10 @@ export default function BackgroundCanvas() {
       />
 
       {/* Interactive canvas for synaptic/clinical nodes */}
-      <canvas ref={canvasRef} className="absolute inset-0 block w-full h-full" />
+      <canvas id="medical-network-canvas" className="absolute inset-0 block w-full h-full" />
+
+      {/* Inline non-blocking script */}
+      <script dangerouslySetInnerHTML={{ __html: canvasScript }} />
     </div>
   );
 }
