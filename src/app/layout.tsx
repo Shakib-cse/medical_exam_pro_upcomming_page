@@ -47,6 +47,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full antialiased scroll-smooth">
+      <head>
+        {/* Preconnect to backend API domain for instant TLS handshake */}
+        <link rel="preconnect" href="https://medical-exam-pro-backend.vercel.app" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://medical-exam-pro-backend.vercel.app" />
+        {/* Preload critical LCP brand logo */}
+        <link rel="preload" href="/images/headerlogo.png" as="image" type="image/png" />
+      </head>
       <body className="min-h-full flex flex-col bg-[#030d17] text-slate-100 selection:bg-[#FF6B00] selection:text-white">
         {children}
       </body>

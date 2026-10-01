@@ -25,6 +25,7 @@ export default function UpcomingHomePage() {
             width={320}
             height={80}
             priority
+            fetchPriority="high"
             className="object-contain w-auto h-full drop-shadow-md"
           />
         </div>
