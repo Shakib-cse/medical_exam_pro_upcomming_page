@@ -91,7 +91,7 @@ export default function OtpVerificationStep({
           ) : (
             <>
               <ShieldCheck className="w-4 h-4" />
-              <span>Confirm & Secure Spot</span>
+              <span>Confirm Registration</span>
             </>
           )}
         </button>
