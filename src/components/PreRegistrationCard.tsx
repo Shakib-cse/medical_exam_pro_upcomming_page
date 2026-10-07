@@ -25,7 +25,7 @@ export default function PreRegistrationCard() {
   const [showPassword, setShowPassword] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
 
-  // UI / Async State - Instant default stats for zero layout shift
+  // UI / Async State
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<StatsData>(DEFAULT_STATS);
@@ -34,51 +34,6 @@ export default function PreRegistrationCard() {
   // Resend Countdown
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
-
-  // Fetch live stats with timeout and sessionStorage caching for ultra-fast first paint
-  const fetchStats = useCallback(async () => {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
-
-      const res = await fetch(`${API_URL}/preregistration/stats`, {
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-
-      const json = await res.json();
-      if (json?.success && json?.data) {
-        setStats(json.data);
-        if (typeof window !== "undefined") {
-          try {
-            sessionStorage.setItem(STATS_STORAGE_KEY, JSON.stringify(json.data));
-          } catch {
-            // Ignore storage errors in private mode
-          }
-        }
-      }
-    } catch {
-      // Keep existing or default stats gracefully without blocking UI
-    }
-  }, [API_URL]);
-
-  // Load cached stats first, then revalidate in background
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = sessionStorage.getItem(STATS_STORAGE_KEY);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (parsed && typeof parsed.spotsRemaining === "number") {
-            setStats(parsed);
-          }
-        }
-      } catch {
-        // Fallback to default stats
-      }
-    }
-    fetchStats();
-  }, [fetchStats]);
 
   // Resend OTP Countdown timer
   useEffect(() => {
@@ -259,7 +214,6 @@ export default function PreRegistrationCard() {
 
       setSuccessData(data.data);
       setStep("success");
-      fetchStats();
     } catch (err: any) {
       setError(err.message || "Verification failed. Please try again.");
     } finally {

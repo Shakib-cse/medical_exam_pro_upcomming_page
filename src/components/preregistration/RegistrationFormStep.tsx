@@ -37,15 +37,14 @@ export default function RegistrationFormStep({
     <div>
       {/* Header Content matching the mockup */}
       <div className="text-center mb-5">
-        {/* Spots remaining badge */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0d2a4d]/80 border border-[#1D82EB]/30 text-xs font-medium text-sky-200 mb-3.5">
+        {/* Early-Bird registration badge */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0d2a4d]/80 border border-[#1D82EB]/30 text-xs font-medium text-sky-200 mb-3.5">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
           </span>
-          <span>
-            <strong className="text-white font-bold">{stats.spotsRemaining}</strong> of{" "}
-            {stats.maxDiscountSpots} early-bird spots left
+          <span className="font-semibold text-white tracking-wide">
+            Early-Bird Registration Open
           </span>
         </div>
 
@@ -56,7 +55,7 @@ export default function RegistrationFormStep({
           50% launch discount
         </div>
         <p className="text-xs sm:text-sm text-slate-300 font-normal max-w-sm mx-auto leading-relaxed">
-          Be among the first 100 clinicians to access Medical Exam Pro with half-price early access.
+          Pre-register today to secure 50% early-bird access when Medical Exam Pro launches.
         </p>
       </div>
 
@@ -146,7 +145,7 @@ export default function RegistrationFormStep({
       </form>
 
       <p className="mt-3.5 text-center text-[11px] text-slate-400">
-        🔒 We will send a 6-digit OTP to your Gmail/inbox to verify your spot.
+        A 6-digit verification code will be sent to your email to confirm your registration.
       </p>
     </div>
   );
