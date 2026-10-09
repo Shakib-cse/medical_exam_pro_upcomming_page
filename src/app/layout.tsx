@@ -40,6 +40,8 @@ export const metadata: Metadata = {
   },
 };
 
+import Analytics from "@/components/Analytics";
+
 export default function RootLayout({
   children,
 }: {
@@ -55,6 +57,7 @@ export default function RootLayout({
         <link rel="preload" href="/images/headerlogo.png" as="image" type="image/png" />
       </head>
       <body className="min-h-full flex flex-col bg-[#030d17] text-slate-100 selection:bg-[#FF6B00] selection:text-white">
+        <Analytics />
         {children}
       </body>
     </html>
