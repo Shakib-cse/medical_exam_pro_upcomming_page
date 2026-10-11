@@ -9,8 +9,8 @@ export default function UpcomingHomePage() {
       {/* Dynamic Background Network Canvas */}
       <BackgroundCanvas />
 
-      {/* Subtle ambient lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-gradient-to-b from-[#1D82EB]/15 via-[#FF6B00]/10 to-transparent blur-[120px] pointer-events-none" />
+      {/* Subtle ambient lighting (desktop only to eliminate heavy mobile blur shader) */}
+      <div className="hidden md:block absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-gradient-to-b from-[#1D82EB]/15 via-[#FF6B00]/10 to-transparent blur-[120px] pointer-events-none" />
 
       {/* Top spacer */}
       <div className="pt-6 sm:pt-10 px-6" />
@@ -20,10 +20,10 @@ export default function UpcomingHomePage() {
         {/* Medical Exam Pro Logo */}
         <div className="relative h-14 sm:h-20 w-64 sm:w-80 mb-7 flex items-center justify-center">
           <Image
-            src="/images/headerlogo.png"
+            src="/images/headerlogo.webp"
             alt="Medical Exam Pro"
-            width={320}
-            height={80}
+            width={731}
+            height={84}
             priority
             fetchPriority="high"
             className="object-contain w-auto h-full drop-shadow-md"

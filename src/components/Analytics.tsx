@@ -14,9 +14,9 @@ export default function Analytics() {
         <>
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID || GA_MEASUREMENT_ID}`}
-            strategy="afterInteractive"
+            strategy="lazyOnload"
           />
-          <Script id="google-tags" strategy="afterInteractive">
+          <Script id="google-tags" strategy="lazyOnload">
             {`
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
@@ -44,7 +44,7 @@ export default function Analytics() {
       {/* Meta Pixel (Facebook Pixel) */}
       {META_PIXEL_ID && (
         <>
-          <Script id="meta-pixel" strategy="afterInteractive">
+          <Script id="meta-pixel" strategy="lazyOnload">
             {`
               !function(f,b,e,v,n,t,s)
               {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -62,9 +62,12 @@ export default function Analytics() {
             <img
               height="1"
               width="1"
+              loading="lazy"
+              decoding="async"
+              aria-hidden="true"
               style={{ display: "none" }}
               src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
-              alt="Meta Pixel"
+              alt=""
             />
           </noscript>
         </>
