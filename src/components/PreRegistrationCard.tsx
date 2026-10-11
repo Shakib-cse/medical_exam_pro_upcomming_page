@@ -252,7 +252,7 @@ export default function PreRegistrationCard() {
   return (
     <div className="w-full max-w-lg mx-auto mt-7">
       {/* Outer Card Container */}
-      <div className="relative rounded-2xl bg-gradient-to-b from-[#071c35] to-[#041224] border border-[#1D82EB]/40 p-5 sm:p-7 shadow-2xl shadow-[#020b16]/90 backdrop-blur-md transition-all duration-300 hover:border-[#1D82EB]/60">
+      <div className="relative rounded-2xl bg-gradient-to-b from-[#071c35] to-[#041224] border border-[#1D82EB]/40 p-5 sm:p-7 shadow-2xl shadow-[#020b16]/90 backdrop-blur-none md:backdrop-blur-md transition-colors duration-200 md:transition-all md:duration-300 hover:border-[#1D82EB]/60">
         {/* Glow corner accents */}
         <div className="absolute -top-px -left-px w-16 h-16 bg-gradient-to-br from-[#1D82EB]/30 to-transparent rounded-tl-2xl pointer-events-none" />
         <div className="absolute -bottom-px -right-px w-16 h-16 bg-gradient-to-tl from-[#FF6B00]/20 to-transparent rounded-br-2xl pointer-events-none" />
