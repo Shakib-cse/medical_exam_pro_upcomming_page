@@ -40,6 +40,8 @@ export const metadata: Metadata = {
   },
 };
 
+import Analytics from "@/components/Analytics";
+
 export default function RootLayout({
   children,
 }: {
@@ -51,10 +53,14 @@ export default function RootLayout({
         {/* Preconnect to backend API domain for instant TLS handshake */}
         <link rel="preconnect" href="https://medical-exam-pro-backend.vercel.app" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://medical-exam-pro-backend.vercel.app" />
-        {/* Preload critical LCP brand logo */}
-        <link rel="preload" href="/images/headerlogo.png" as="image" type="image/png" />
+        {/* DNS prefetch for deferred analytics scripts */}
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://connect.facebook.net" />
+        {/* Preload critical LCP brand logo in optimized WebP format */}
+        <link rel="preload" href="/images/headerlogo.webp" as="image" type="image/webp" />
       </head>
       <body className="min-h-full flex flex-col bg-[#030d17] text-slate-100 selection:bg-[#FF6B00] selection:text-white">
+        <Analytics />
         {children}
       </body>
     </html>

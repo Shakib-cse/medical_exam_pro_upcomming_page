@@ -15,18 +15,24 @@ export default function BackgroundCanvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    // Respect user motion preference
     if (typeof window === "undefined") return;
+
+    // Respect user motion preference
     if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
 
-    let animId: number;
+    let animId: number | null = null;
     let isVisible = true;
+    let cleanupAnim: (() => void) | null = null;
     let resizeTimer: NodeJS.Timeout;
 
-    // Defer particle initialization until browser is idle so first paint and hydration are instant
-    const initCanvas = () => {
+    const startAnimation = () => {
+      // Strictly disabled on mobile viewports (< 768px)
+      if (window.innerWidth < 768) {
+        return;
+      }
+
       const canvas = canvasRef.current;
       if (!canvas) return;
 
@@ -36,19 +42,7 @@ export default function BackgroundCanvas() {
       let width = (canvas.width = window.innerWidth);
       let height = (canvas.height = window.innerHeight);
 
-      const handleResize = () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-          if (!canvasRef.current) return;
-          width = canvasRef.current.width = window.innerWidth;
-          height = canvasRef.current.height = window.innerHeight;
-        }, 150);
-      };
-
-      window.addEventListener("resize", handleResize, { passive: true });
-
-      const isMobile = width < 768;
-      const maxNodes = isMobile ? 16 : 32;
+      const maxNodes = 32;
       const nodeCount = Math.min(Math.floor((width * height) / 28000), maxNodes);
       const nodes: NodePoint[] = [];
 
@@ -73,18 +67,21 @@ export default function BackgroundCanvas() {
 
       const handleVisibilityChange = () => {
         isVisible = !document.hidden;
-        if (isVisible) {
+        if (isVisible && !animId) {
           animId = requestAnimationFrame(render);
+        } else if (!isVisible && animId) {
+          cancelAnimationFrame(animId);
+          animId = null;
         }
       };
       document.addEventListener("visibilitychange", handleVisibilityChange);
 
-      const connectionDist = isMobile ? 90 : 120;
+      const connectionDist = 120;
       const connectionDistSq = connectionDist * connectionDist;
       const mouseDistThresholdSq = 150 * 150;
 
       function render() {
-        if (!isVisible || !ctx) return;
+        if (!isVisible || !ctx || window.innerWidth < 768) return;
         ctx.clearRect(0, 0, width, height);
 
         const len = nodes.length;
@@ -119,7 +116,6 @@ export default function BackgroundCanvas() {
             const dy = n.y - o.y;
             const distSq = dx * dx + dy * dy;
 
-            // Only compute square root when nodes are within connecting distance (eliminates 90% Math.sqrt calls)
             if (distSq < connectionDistSq) {
               const dist = Math.sqrt(distSq);
               const lineAlpha = (1 - dist / connectionDist) * 0.14;
@@ -138,43 +134,90 @@ export default function BackgroundCanvas() {
 
       animId = requestAnimationFrame(render);
 
-      return () => {
-        cancelAnimationFrame(animId);
-        window.removeEventListener("resize", handleResize);
+      cleanupAnim = () => {
+        if (animId) {
+          cancelAnimationFrame(animId);
+          animId = null;
+        }
         window.removeEventListener("mousemove", handleMouseMove);
         document.removeEventListener("visibilitychange", handleVisibilityChange);
+        if (canvasRef.current && ctx) {
+          ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        }
       };
     };
 
-    // Use requestIdleCallback if available, otherwise setTimeout
-    let cleanupFn: (() => void) | undefined;
-    if ("requestIdleCallback" in window) {
-      const idleId = (window as any).requestIdleCallback(() => {
-        cleanupFn = initCanvas();
-      });
-      return () => {
-        if ("cancelIdleCallback" in window) {
-          (window as any).cancelIdleCallback(idleId);
+    const stopAnimation = () => {
+      if (cleanupAnim) {
+        cleanupAnim();
+        cleanupAnim = null;
+      }
+    };
+
+    const handleWindowResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (window.innerWidth < 768) {
+          stopAnimation();
+        } else {
+          if (!cleanupAnim) {
+            startAnimation();
+          } else if (canvasRef.current) {
+            canvasRef.current.width = window.innerWidth;
+            canvasRef.current.height = window.innerHeight;
+          }
         }
-        cleanupFn?.();
-      };
-    } else {
-      const timer = setTimeout(() => {
-        cleanupFn = initCanvas();
-      }, 100);
-      return () => {
-        clearTimeout(timer);
-        cleanupFn?.();
-      };
+      }, 150);
+    };
+
+    window.addEventListener("resize", handleWindowResize, { passive: true });
+
+    // Only initiate on desktop viewports (>= 768px)
+    if (window.innerWidth >= 768) {
+      if ("requestIdleCallback" in window) {
+        const idleId = (window as any).requestIdleCallback(() => {
+          startAnimation();
+        });
+        return () => {
+          if ("cancelIdleCallback" in window) {
+            (window as any).cancelIdleCallback(idleId);
+          }
+          stopAnimation();
+          window.removeEventListener("resize", handleWindowResize);
+        };
+      } else {
+        const timer = setTimeout(() => {
+          startAnimation();
+        }, 100);
+        return () => {
+          clearTimeout(timer);
+          stopAnimation();
+          window.removeEventListener("resize", handleWindowResize);
+        };
+      }
     }
+
+    return () => {
+      window.removeEventListener("resize", handleWindowResize);
+      stopAnimation();
+    };
   }, []);
 
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
-      {/* Deep ambient backdrop glows - pure CSS hardware-accelerated */}
-      <div className="absolute -top-40 left-1/4 w-[650px] h-[650px] bg-[#1D82EB]/15 rounded-full blur-[140px] pointer-events-none will-change-transform" />
-      <div className="absolute top-1/3 -right-36 w-[550px] h-[550px] bg-[#FF6B00]/10 rounded-full blur-[160px] pointer-events-none will-change-transform" />
-      <div className="absolute bottom-10 left-10 w-[500px] h-[500px] bg-[#00d2ff]/10 rounded-full blur-[150px] pointer-events-none" />
+      {/* Mobile-only static high-performance CSS gradient background (viewport < 768px) */}
+      <div
+        className="md:hidden absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle at 50% 15%, rgba(29, 130, 235, 0.16) 0%, transparent 60%), radial-gradient(circle at 85% 45%, rgba(255, 107, 0, 0.10) 0%, transparent 50%), radial-gradient(circle at 15% 80%, rgba(0, 210, 255, 0.08) 0%, transparent 50%), #030d17",
+        }}
+      />
+
+      {/* Desktop-only deep ambient backdrop glows (viewport >= 768px) */}
+      <div className="hidden md:block absolute -top-40 left-1/4 w-[650px] h-[650px] bg-[#1D82EB]/15 rounded-full blur-[140px] pointer-events-none will-change-transform" />
+      <div className="hidden md:block absolute top-1/3 -right-36 w-[550px] h-[550px] bg-[#FF6B00]/10 rounded-full blur-[160px] pointer-events-none will-change-transform" />
+      <div className="hidden md:block absolute bottom-10 left-10 w-[500px] h-[500px] bg-[#00d2ff]/10 rounded-full blur-[150px] pointer-events-none" />
 
       {/* Subtle medical grid pattern */}
       <div
@@ -186,8 +229,8 @@ export default function BackgroundCanvas() {
         }}
       />
 
-      {/* Interactive canvas for synaptic/clinical nodes */}
-      <canvas ref={canvasRef} className="absolute inset-0 block w-full h-full" />
+      {/* Interactive canvas for synaptic/clinical nodes (strictly desktop only >= 768px) */}
+      <canvas ref={canvasRef} className="hidden md:block absolute inset-0 w-full h-full" />
     </div>
   );
 }

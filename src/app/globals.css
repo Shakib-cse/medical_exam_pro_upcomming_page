@@ -23,11 +23,30 @@
     background-color: var(--navy-darkest);
     color: #f1f5f9;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-display: swap;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   body {
     background-color: var(--navy-darkest);
     overflow-x: hidden;
+  }
+
+  button,
+  a,
+  input {
+    touch-action: manipulation;
+  }
+}
+
+/* Mobile input zoom prevention for iOS - keeps interaction fast and avoids layout shift */
+@media (max-width: 767.98px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    font-size: 16px !important;
   }
 }
 
@@ -69,32 +88,66 @@
   animation: floatSlow 4s ease-in-out infinite;
 }
 
-.glass-panel {
-  background: rgba(10, 34, 56, 0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+/* Glassmorphism Styles - Mobile vs Desktop Media Query Optimization */
+@media (max-width: 767.98px) {
+  /* Disable expensive backdrop-filter on mobile viewports (< 768px) */
+  .glass-panel {
+    background: #0a2238;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-panel-interactive {
+    background: #0a2238;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .glass-panel-interactive:hover {
+    background: #0d2b47;
+    border-color: rgba(29, 130, 235, 0.4);
+  }
+
+  .glass-card-accent {
+    background: #0a243d;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+  }
 }
 
-.glass-panel-interactive {
-  background: rgba(10, 34, 56, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
+@media (min-width: 768px) {
+  /* Retain rich blurred glassmorphism on desktop viewports (>= 768px) */
+  .glass-panel {
+    background: rgba(10, 34, 56, 0.72);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
 
-.glass-panel-interactive:hover {
-  background: rgba(13, 43, 71, 0.85);
-  border-color: rgba(29, 130, 235, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px -10px rgba(0, 180, 255, 0.15);
-}
+  .glass-panel-interactive {
+    background: rgba(10, 34, 56, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 
-.glass-card-accent {
-  background: linear-gradient(135deg, rgba(29, 130, 235, 0.12), rgba(255, 107, 0, 0.08));
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  .glass-panel-interactive:hover {
+    background: rgba(13, 43, 71, 0.85);
+    border-color: rgba(29, 130, 235, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px -10px rgba(0, 180, 255, 0.15);
+  }
+
+  .glass-card-accent {
+    background: linear-gradient(135deg, rgba(29, 130, 235, 0.12), rgba(255, 107, 0, 0.08));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+  }
 }
 
 .text-gradient-orange {
